@@ -17,8 +17,7 @@ class CategoryController extends Controller
     {
         // $category = Category::with('sub_categories.child_categories')
         //     ->findOrFail($id);
-        $category = Category::with('sub_categories.child_categories')
-        ->find($id);
+        $category = Category::with('sub_categories.child_categories')->find($id);
 
     // Agar category na mile to empty products ke sath view dikhao
     if (!$category) {

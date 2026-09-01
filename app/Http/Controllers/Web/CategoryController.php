@@ -15,8 +15,16 @@ class CategoryController extends Controller
      */
     public function index($id)
     {
+        // $category = Category::with('sub_categories.child_categories')
+        //     ->findOrFail($id);
         $category = Category::with('sub_categories.child_categories')
-            ->findOrFail($id);
+        ->find($id);
+
+    // Agar category na mile to empty products ke sath view dikhao
+    if (!$category) {
+        $products = collect(); // empty collection
+        return view('web.pages.category.index', compact('category', 'products'));
+    }
 
         $subCategoryIds = $category->sub_categories->pluck('id');
 
@@ -39,8 +47,14 @@ class CategoryController extends Controller
      */
     public function subCategory($id)
     {
-        $subCategory = SubCategory::with('category')->findOrFail($id);
+        //$subCategory = SubCategory::with('category')->findOrFail($id);
 
+        $subCategory = SubCategory::with('category')->find($id);
+         if (!$subCategory) {
+        $products = collect(); // empty collection
+        return view('web.pages.category.index', compact('subCategory', 'products'));
+    }
+    
         $products = Product::with([
                 'product_images',
                 'product_variants.product_size',
@@ -60,8 +74,13 @@ class CategoryController extends Controller
      */
     public function childCategory($id)
     {
-        $childCategory = ChildCategory::with('sub_category.category')->findOrFail($id);
+        // $childCategory = ChildCategory::with('sub_category.category')->findOrFail($id);
 
+        $childCategory = ChildCategory::with('sub_category.category')->find($id);
+         if (!$childCategory) {
+        $products = collect(); // empty collection
+        return view('web.pages.category.index', compact('childCategory', 'products'));
+    }
         $products = Product::with([
                 'product_images',
                 'product_variants.product_size',

@@ -23,8 +23,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $categories = Category::with('sub_Categories.child_Categories')->get();
-        view()->share('categories', $categories);
+        try {            
+            $categories = Category::with('sub_Categories.child_Categories')->get();
+            view()->share('categories', $categories);
+        } catch (\Exception $e) {
+                view()->share('categories', collect());
+        }
 
         // Cart - sirf cart-drawer view ke liye
         View::composer('web.layout.cart-drawer', function ($view) {

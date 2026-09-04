@@ -1,4 +1,4 @@
-@extends('web.layout.master')
+{{-- @extends('web.layout.master')
 
 @section('title', $page->page_name . ' – Sapphire')
 
@@ -15,5 +15,26 @@
         </div>
 
     </div>
+
+@endsection --}}
+
+
+@extends('web.layout.master')
+
+@section('title', $page->page_name . ' – Sapphire')
+
+@section('content')
+
+<div class="page-content-wrapper">
+
+    <div class="page-content-hero text-center">
+        <h1>{{ $page->page_name }}</h1>
+    </div>
+
+    <div class="page-content-body">
+        {!! $page->content !!}
+    </div>
+
+</div>
 
 @endsection

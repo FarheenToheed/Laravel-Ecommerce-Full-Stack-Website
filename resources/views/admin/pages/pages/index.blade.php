@@ -9,9 +9,9 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Pages</h5>
 
-                        <a href="{{ route('admin.pages.create') }}" class="btn btn-primary">
+                        {{-- <a href="{{ route('admin.pages.create') }}" class="btn btn-primary">
                             + Create Page
-                        </a>
+                        </a> --}}
                     </div>
 
                     <div class="card-body">
@@ -46,7 +46,7 @@
                                                         <i class="fa fa-pencil"></i>
                                                     </a>
 
-                                                    <form action="{{ route('admin.pages.destroy', $page->id) }}" method="POST"
+                                                    {{-- <form action="{{ route('admin.pages.destroy', $page->id) }}" method="POST"
                                                         onsubmit="return confirm('Are you sure?')">
                                                         @csrf
                                                         @method('DELETE')
@@ -54,7 +54,7 @@
                                                         <button class="btn btn-xs btn-danger" type="submit">
                                                             <i class="fa fa-trash"></i>
                                                         </button>
-                                                    </form>
+                                                    </form> --}}
                                                 </div>
                                             </td>
                                         </tr>

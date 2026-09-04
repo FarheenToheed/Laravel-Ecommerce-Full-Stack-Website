@@ -183,6 +183,7 @@ body {
     border-top: 1px solid #e8e8e8;
     padding: 50px 40px 20px;
     margin-top: 60px;
+    
 }
 
 .footer-grid {
@@ -5954,3 +5955,37 @@ BUTTON
 }
 
 /* about us , contact us page responsiveness + styling */
+.page-content-wrapper {
+        padding: 40px 60px 60px 60px;
+    }
+
+    .page-content-hero {
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        padding-top: 15px;
+        padding-bottom: 12px;
+        margin-top: 15px;
+    }
+
+    .page-content-hero h1 {
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .page-content-body {
+        line-height: 1.8;
+        font-size: 15px;
+        color: #333;
+    }
+
+    .page-content-body p {
+        margin-bottom: 16px;
+    }
+
+    @media (max-width: 768px) {
+        .page-content-wrapper {
+            padding: 25px 20px 40px 20px;
+        }
+    }

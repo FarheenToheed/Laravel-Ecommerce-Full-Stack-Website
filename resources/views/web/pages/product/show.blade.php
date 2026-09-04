@@ -53,13 +53,9 @@
             @endif
 
             {{-- Size Selection --}}
-            {{-- <div class="pd-size-section" data-has-sizes="{{ $product->available_sizes->count() ? 'true' : 'false' }}">
+            <div class="pd-size-section" data-has-sizes="{{ $product->available_sizes->count() ? 'true' : 'false' }}">
 
                 @if($product->available_sizes->count())
-                    <div class="pd-size-heading">
-                        <span>SELECT YOUR SIZE</span>
-                        <a href="#" id="pdOpenSizeGuideBtn">SIZE CHART</a>
-                    </div>
 
                     <div class="pd-size-options">
                         @foreach($product->available_sizes as $size)
@@ -70,7 +66,7 @@
                     </div>
                 @endif
 
-            </div> --}}
+            </div>
 
             {{-- Quantity + Add to Bag --}}
 <div class="pd-action-row">

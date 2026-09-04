@@ -2,3 +2,5 @@
 !.gitignore
 !products/
 !products/**
+!blogs/
+!blogs/**

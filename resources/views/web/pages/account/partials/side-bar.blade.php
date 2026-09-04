@@ -1,7 +1,11 @@
 {{-- LEFT SIDEBAR --}}
     <div class="account-sidebar">
 
-        <h4>Dashboard</h4>
+        <h4>
+        <a href="{{ route('account') }}" style="color:inherit; text-decoration:none;">
+            Dashboard
+        </a>
+    </h4>
 
         <ul>
             <li>

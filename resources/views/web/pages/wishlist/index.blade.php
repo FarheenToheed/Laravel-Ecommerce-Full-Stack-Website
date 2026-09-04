@@ -12,7 +12,6 @@
 
             <div class="wishlist-header">
                 <h2>{{ strtoupper(Auth::user()->name) }}'S WISHLIST</h2>
-                <a href="#" class="wishlist-share-link">Share Your List</a>
             </div>
 
             <div class="wishlist-grid">

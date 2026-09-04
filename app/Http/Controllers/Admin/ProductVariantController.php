@@ -53,12 +53,34 @@ class ProductVariantController extends Controller
         // $variantExists = ProductVariant::where('product_id', $request->product_id)
         //     ->where('size_id', $request->size_id)->Where('color_id', $request->color_id)->exists();
         
-        $variantExists = ProductVariant::where('product_id', $request->product_id)->where(function ($q) use ($request) {
-            $q->where('size_id', $request->size_id)->Where('color_id', $request->color_id);
-        })->exists();
-        if ($variantExists) {
-            return redirect()->back()->with('error', 'Product variant for this color or size already exists');
+
+        // $variantExists = ProductVariant::where('product_id', $request->product_id)->where(function ($q) use ($request) {
+        //     $q->where('size_id', $request->size_id)->Where('color_id', $request->color_id);
+        // })->exists();
+        // if ($variantExists) {
+        //     return redirect()->back()->with('error', 'Product variant for this color or size already exists');
+        // }
+        // Agar size di gayi hai, to check karo isi product ki wahi size pehle se to nahi
+    if ($request->size_id) {
+        $sizeExists = ProductVariant::where('product_id', $request->product_id)
+            ->where('size_id', $request->size_id)
+            ->exists();
+
+        if ($sizeExists) {
+            return redirect()->back()->with('error', 'Variant for this size already exists');
         }
+    }
+
+    // Agar color di gayi hai, to check karo isi product ka wahi color pehle se to nahi
+    if ($request->color_id) {
+        $colorExists = ProductVariant::where('product_id', $request->product_id)
+            ->where('color_id', $request->color_id)
+            ->exists();
+
+        if ($colorExists) {
+            return redirect()->back()->with('error', 'Variant for this color already exists');
+        }
+    }
 
         ProductVariant::create([
             'product_id' => $request->product_id,
@@ -116,6 +138,31 @@ class ProductVariantController extends Controller
         if(!$product_variants){
             return redirect()->back()->with('error', 'Product Variant not found');
         }
+
+
+    // Size check 
+    if ($request->size_id) {
+        $sizeExists = ProductVariant::where('product_id', $request->product_id)
+            ->where('size_id', $request->size_id)
+            ->where('id', '!=', $id)
+            ->exists();
+
+        if ($sizeExists) {
+            return redirect()->back()->with('error', 'Variant for this size already exists');
+        }
+    }
+
+    // Color check
+    if ($request->color_id) {
+        $colorExists = ProductVariant::where('product_id', $request->product_id)
+            ->where('color_id', $request->color_id)
+            ->where('id', '!=', $id)
+            ->exists();
+
+        if ($colorExists) {
+            return redirect()->back()->with('error', 'Variant for this color already exists');
+        }
+    }
          $product_variants->update([
             'product_id' => $request->product_id,
             'size_id' => $request->size_id,

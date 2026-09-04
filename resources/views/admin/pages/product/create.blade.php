@@ -21,12 +21,14 @@
                         <form action="{{ route('admin.product.store') }}" enctype="multipart/form-data"
                             class="d-flex flex-column gap-3" method="post">
                             @csrf
-{{-- value="{{ old('name', $product->name) }}" for edit form checking --}}
-{{-- is mai phale us input field ka name hoga or dosra null string h jha pr uski default value jati h lakin current time mia ue null chorna h kyo k hm koi default value show hi ni krva rahe --}}
+                            {{-- value="{{ old('name', $product->name) }}" for edit form checking --}}
+                            {{-- is mai phale us input field ka name hoga or dosra null string h jha pr uski default value
+                            jati h lakin current time mia ue null chorna h kyo k hm koi default value show hi ni krva rahe
+                            --}}
                             {{-- Product Name --}}
                             <label for="name">Enter Product Name
-                                <input type="text" name="name" placeholder="Enter Product Name"
-                                    class="form-control text-xs" value="{{ old('name', '') }}">
+                                <input type="text" name="name" placeholder="Enter Product Name" class="form-control text-xs"
+                                    value="{{ old('name', '') }}">
 
                                 @error('name')
                                     <div class="alert alert-danger">{{ $message }}</div>
@@ -42,10 +44,10 @@
                             <label for="detail">Enter Products Details
                                 <textarea class="form-control text-xs" name="details"
                                     placeholder="Enter Product Details">{{ old('details', '') }}</textarea>
-                            
-                            @error('details')
-                                <div class="alert alert-danger">{{ $message }}</div>
-                            @enderror
+
+                                @error('details')
+                                    <div class="alert alert-danger">{{ $message }}</div>
+                                @enderror
                             </label>
 
                             {{-- Description --}}
@@ -60,76 +62,74 @@
                             {{-- Size Guide --}}
                             <label for="size_guide">Enter Size Guide
                                 <textarea class="form-control text-xs" name="size_guide"
-                                    placeholder="Enter Size Guide" >{{ old('size_guide', '') }}</textarea>
+                                    placeholder="Enter Size Guide">{{ old('size_guide', '') }}</textarea>
                             </label>
                             @error('size_guide')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
 
                             {{-- Stock --}}
+                            {{-- Category, Sub Category, Child Category, Status --}}
                             <div class="row">
+
+                                {{-- Category --}}
                                 <div class="col-md-6">
-
-                                    <label for="stock">Enter Stock Quantity</label>
-                                    <input type="number" name="stock" placeholder="Enter Stock Quantity"
-                                        class="form-control text-xs" value="{{ old('stock', '') }}">
-
-                                    @error('stock')
-                                        <div class="alert alert-danger">{{ $message }}</div>
-                                    @enderror
+                                    <label for="category">Select Category</label>
+                                    <select class="form-select text-xs" id="category_select" required>
+                                        <option value="">Select Category</option>
+                                        @foreach ($categories as $cat)
+                                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
-
 
                                 {{-- Sub Category --}}
                                 <div class="col-md-6">
-                                    <label for="sub_category">Select Sub Categories</label>
-                                    <select class="form-select text-xs" name="sub_category_id" >
+                                    <label for="sub_category">Select Sub Category</label>
+                                    <select class="form-select text-xs" name="sub_category_id" id="sub_category_select"
+                                        required disabled>
                                         <option value="">Select Sub Category</option>
-                                        @foreach ($sub_categories as $sub)
-                                            <option value="{{ $sub->id }}" {{ old('sub_category_id', '') == $sub->id ? 'selected' : '' }}>
-                                                {{ $sub->name }}
-                                            </option>
-                                        @endforeach
                                     </select>
-
                                     @error('sub_category_id')
                                         <div class="alert alert-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
 
-
                                 {{-- Child Category --}}
                                 <div class="col-md-6">
                                     <label for="child_category">Select Child Category</label>
-                                    <select class="form-select text-xs" name="child_category_id">
+                                    <select class="form-select text-xs" name="child_category_id" id="child_category_select"
+                                        required disabled>
                                         <option value="">Select Child Category</option>
-                                        @foreach ($child_categories as $child)
-                                            <option value="{{ $child->id }}" {{ old('child_category_id', '') == $child->id ? 'selected' : '' }}>
-                                                {{ $child->name }}
-                                            </option>
-                                        @endforeach
                                     </select>
-
                                     @error('child_category_id')
                                         <div class="alert alert-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
 
+                                {{-- Stock --}}
+                                <div class="col-md-6">
+                                    <label for="stock">Enter Stock Quantity</label>
+                                    <input type="number" name="stock" placeholder="Enter Stock Quantity"
+                                        class="form-control text-xs" value="{{ old('stock', '') }}">
+                                    @error('stock')
+                                        <div class="alert alert-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
                                 {{-- Status --}}
-
                                 <div class="col-md-6">
                                     <label for="status">Select Status</label>
-                                    <select class="form-select text-xs" name="status" id="status" value="{{ old('status', '') }}">
+                                    <select class="form-select text-xs" name="status" id="status">
                                         <option value="">Select Status</option>
                                         <option value="active">Active</option>
                                         <option value="inactive">Inactive</option>
                                     </select>
-
                                     @error('status')
                                         <div class="alert alert-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
+
                             </div>
 
                             <label>
@@ -160,61 +160,116 @@
 @endsection
 
 @push('js')
-<script>
-let input = document.getElementById('imageInput');
-let preview = document.getElementById('previewContainer');
+    <script>
+        // PHP se saara categories > sub_categories > child_categories data JS mein bhej rahe hain
+        const categoriesData = @json($categories);
 
-let filesArray = [];
+        const categorySelect = document.getElementById('category_select');
+        const subCategorySelect = document.getElementById('sub_category_select');
+        const childCategorySelect = document.getElementById('child_category_select');
 
-input.addEventListener('change', function () {
+        categorySelect.addEventListener('change', function () {
 
-    // add new files to existing array
-    filesArray = filesArray.concat(Array.from(this.files));
+            const categoryId = this.value;
 
-    updateInput();
-    render();
-});
+            // Reset dono dropdowns
+            subCategorySelect.innerHTML = '<option value="">Select Sub Category</option>';
+            childCategorySelect.innerHTML = '<option value="">Select Child Category</option>';
+            childCategorySelect.disabled = true;
 
-function render() {
-    preview.innerHTML = "";
+            if (!categoryId) {
+                subCategorySelect.disabled = true;
+                return;
+            }
 
-    filesArray.forEach((file, i) => {
+            const category = categoriesData.find(cat => cat.id == categoryId);
 
-        let reader = new FileReader();
+            if (category && category.sub_categories.length) {
+                category.sub_categories.forEach(sub => {
+                    subCategorySelect.innerHTML += `<option value="${sub.id}">${sub.name}</option>`;
+                });
+                subCategorySelect.disabled = false;
+            }
+        });
 
-        reader.onload = function (e) {
-            preview.innerHTML += `
-                <div style="position:relative;">
-                    <img src="${e.target.result}" width="100" height="100"
-                        style="object-fit:cover;border-radius:6px;">
 
-                    <button type="button"
-                        onclick="removeImg(${i})"
-                        style="position:absolute;top:-5px;right:-5px;
-                        background:red;color:#fff;border:none;border-radius:50%;">
-                        ×
-                    </button>
-                </div>
-            `;
-        };
+        subCategorySelect.addEventListener('change', function () {
 
-        reader.readAsDataURL(file);
-    });
-}
+            const subCategoryId = this.value;
 
-function removeImg(index) {
-    filesArray.splice(index, 1);
-    updateInput();
-    render();
-}
+            childCategorySelect.innerHTML = '<option value="">Select Child Category</option>';
 
-function updateInput() {
-    let dt = new DataTransfer();
+            if (!subCategoryId) {
+                childCategorySelect.disabled = true;
+                return;
+            }
 
-    filesArray.forEach(file => dt.items.add(file));
+            const categoryId = categorySelect.value;
+            const category = categoriesData.find(cat => cat.id == categoryId);
+            const subCategory = category.sub_categories.find(sub => sub.id == subCategoryId);
 
-    input.files = dt.files;
-}
-</script>
-    
+            if (subCategory && subCategory.child_categories.length) {
+                subCategory.child_categories.forEach(child => {
+                    childCategorySelect.innerHTML += `<option value="${child.id}">${child.name}</option>`;
+                });
+                childCategorySelect.disabled = false;
+            }
+        });
+
+        let input = document.getElementById('imageInput');
+        let preview = document.getElementById('previewContainer');
+
+        let filesArray = [];
+
+        input.addEventListener('change', function () {
+
+            // add new files to existing array
+            filesArray = filesArray.concat(Array.from(this.files));
+
+            updateInput();
+            render();
+        });
+
+        function render() {
+            preview.innerHTML = "";
+
+            filesArray.forEach((file, i) => {
+
+                let reader = new FileReader();
+
+                reader.onload = function (e) {
+                    preview.innerHTML += `
+                        <div style="position:relative;">
+                            <img src="${e.target.result}" width="100" height="100"
+                                style="object-fit:cover;border-radius:6px;">
+
+                            <button type="button"
+                                onclick="removeImg(${i})"
+                                style="position:absolute;top:-5px;right:-5px;
+                                background:red;color:#fff;border:none;border-radius:50%;">
+                                ×
+                            </button>
+                        </div>
+                    `;
+                };
+
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function removeImg(index) {
+            filesArray.splice(index, 1);
+            updateInput();
+            render();
+        }
+
+        function updateInput() {
+            let dt = new DataTransfer();
+
+            filesArray.forEach(file => dt.items.add(file));
+
+            input.files = dt.files;
+        }
+    </script>
+
 @endpush

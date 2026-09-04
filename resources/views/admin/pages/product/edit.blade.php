@@ -48,51 +48,67 @@
 
 
                             <div class="row">
-                                {{-- Stock --}}
 
-                                <div class="col-md-6">
-                                    <label for="stock">Enter Product Stock</label>
-                                    <input type="number" name="stock" class="form-control text-xs"
-                                        value="{{ $product->stock }}" placeholder="Enter Stock">
+    {{-- Category --}}
+    <div class="col-md-6">
+        <label for="category">Select Category</label>
+        <select class="form-select text-xs" id="category_select" required>
+            <option value="">Select Category</option>
+            @foreach ($categories as $cat)
+                <option value="{{ $cat->id }}"
+                    {{ optional($product->sub_category->category)->id == $cat->id ? 'selected' : '' }}>
+                    {{ $cat->name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
 
-                                </div>
+    {{-- Sub Category --}}
+    <div class="col-md-6">
+        <label for="sub_category">Select Sub Category</label>
+        <select class="form-select text-xs" name="sub_category_id" id="sub_category_select" required>
+            <option value="">Select Sub Category</option>
+        </select>
+        @error('sub_category_id')
+            <div class="alert alert-danger">{{ $message }}</div>
+        @enderror
+    </div>
 
-                                {{-- Sub Category --}}
-                                <div class="col-md-6">
-                                    <label for="sub_category">Select Sub Categories</label>
-                                    <select name="sub_category_id" class="form-select text-xs">
-                                        @foreach($sub_categories as $sub)
-                                            <option value="{{ $sub->id }}" {{ $product->sub_category_id == $sub->id ? 'selected' : '' }}>
-                                                {{ $sub->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+    {{-- Child Category --}}
+    <div class="col-md-6">
+        <label for="child_category">Select Child Category</label>
+        <select class="form-select text-xs" name="child_category_id" id="child_category_select" required>
+            <option value="">Select Child Category</option>
+        </select>
+        @error('child_category_id')
+            <div class="alert alert-danger">{{ $message }}</div>
+        @enderror
+    </div>
 
-                                </div>
+    {{-- Stock --}}
+    <div class="col-md-6">
+        <label for="stock">Enter Stock Quantity</label>
+        <input type="number" name="stock" class="form-control text-xs"
+            value="{{ old('stock', $product->stock) }}">
+        @error('stock')
+            <div class="alert alert-danger">{{ $message }}</div>
+        @enderror
+    </div>
 
-                                {{-- Child Category --}}
-                                <div class="col-md-6">
-                                    <label for="child_category">Select Child Categories</label>
-                                    <select name="child_category_id" class="form-select text-xs">
-                                        @foreach($child_categories as $child)
-                                            <option value="{{ $child->id }}" {{ $product->child_category_id == $child->id ? 'selected' : '' }}>
-                                                {{ $child->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
+    {{-- Status --}}
+    <div class="col-md-6">
+        <label for="status">Select Status</label>
+        <select class="form-select text-xs" name="status" id="status">
+            <option value="">Select Status</option>
+            <option value="active" {{ $product->status == 'active' ? 'selected' : '' }}>Active</option>
+            <option value="inactive" {{ $product->status == 'inactive' ? 'selected' : '' }}>Inactive</option>
+        </select>
+        @error('status')
+            <div class="alert alert-danger">{{ $message }}</div>
+        @enderror
+    </div>
 
-                                {{-- Status --}}
-                                <div class="col-md-6">
-                                    <label for="status">Select Status</label>
-                                    <select name="status" class="form-select text-xs" id="status">
-                                        <option value="active" {{ $product->status == 'active' ? 'selected' : '' }}>Active
-                                        </option>
-                                        <option value="inactive" {{ $product->status == 'inactive' ? 'selected' : '' }}>
-                                            Inactive</option>
-                                    </select>
-                                </div>
-                            </div>
+</div>
                             {{-- images --}}
                             <label>Product Images</label>
 
@@ -139,7 +155,74 @@
     </div>
 @endsection
 @push('js')
+
 <script>
+    const categoriesData = @json($categories);
+
+    // Product ki abhi ki saved values (edit ke liye zaroori)
+    const currentSubCategoryId = {{ $product->sub_category_id ?? 'null' }};
+    const currentChildCategoryId = {{ $product->child_category_id ?? 'null' }};
+
+    const categorySelect = document.getElementById('category_select');
+    const subCategorySelect = document.getElementById('sub_category_select');
+    const childCategorySelect = document.getElementById('child_category_select');
+
+    function loadSubCategories(categoryId, preselectSubId = null) {
+
+        subCategorySelect.innerHTML = '<option value="">Select Sub Category</option>';
+        childCategorySelect.innerHTML = '<option value="">Select Child Category</option>';
+
+        if (!categoryId) return;
+
+        const category = categoriesData.find(cat => cat.id == categoryId);
+
+        if (category && category.sub_categories.length) {
+            category.sub_categories.forEach(sub => {
+                const selected = (sub.id == preselectSubId) ? 'selected' : '';
+                subCategorySelect.innerHTML += `<option value="${sub.id}" ${selected}>${sub.name}</option>`;
+            });
+        }
+    }
+
+    function loadChildCategories(categoryId, subCategoryId, preselectChildId = null) {
+
+        childCategorySelect.innerHTML = '<option value="">Select Child Category</option>';
+
+        if (!subCategoryId) return;
+
+        const category = categoriesData.find(cat => cat.id == categoryId);
+        if (!category) return;
+
+        const subCategory = category.sub_categories.find(sub => sub.id == subCategoryId);
+
+        if (subCategory && subCategory.child_categories.length) {
+            subCategory.child_categories.forEach(child => {
+                const selected = (child.id == preselectChildId) ? 'selected' : '';
+                childCategorySelect.innerHTML += `<option value="${child.id}" ${selected}>${child.name}</option>`;
+            });
+        }
+    }
+
+    // Page load hote hi purani saved values ke hisaab se dropdowns bhar dein
+    window.addEventListener('DOMContentLoaded', function () {
+
+        const initialCategoryId = categorySelect.value;
+
+        if (initialCategoryId) {
+            loadSubCategories(initialCategoryId, currentSubCategoryId);
+            loadChildCategories(initialCategoryId, currentSubCategoryId, currentChildCategoryId);
+        }
+    });
+
+    // Jab user khud Category badle
+    categorySelect.addEventListener('change', function () {
+        loadSubCategories(this.value);
+    });
+
+    // Jab user khud Sub Category badle
+    subCategorySelect.addEventListener('change', function () {
+        loadChildCategories(categorySelect.value, this.value);
+    });
 function removeOldImg(btn, id)
 {
     btn.parentElement.remove();

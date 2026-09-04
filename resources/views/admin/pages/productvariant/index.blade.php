@@ -202,10 +202,11 @@
                                     </div>
                                 @enderror
                             </div>
-                                {{-- Child Category Dropdown --}}
+                                {{-- size drop down --}}
                             <div class="form-group mb-1">
                                 <h6 class=" text-xs mb-0">Product Size</h6>
                                 <select name="size_id" class="form-control" id="edit_size_id">
+                                      <option value="">Select Size</option>
                                     @foreach($product_size as $pro)
                                     <option value="{{ $pro->id }}">
                                         {{ $pro->name }}
@@ -218,10 +219,11 @@
                                     </div>
                                 @enderror
                             </div>    
-                                {{-- Child Category Dropdown --}}
+                                {{-- Color dropdown--}}
                             <div class="form-group mb-1">
                                 <h6 class=" text-xs mb-0">Product Color</h6>
                                 <select name="color_id" class="form-control" id="edit_color_id">
+                                      <option value="">Select color</option>
                                     @foreach($product_color as $pro)
                                     <option value="{{ $pro->id }}">
                                         {{ $pro->name }}

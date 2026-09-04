@@ -7,6 +7,7 @@ use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use App\Models\ChildCategory;
 use App\Models\SubCategory;
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 class ProductController extends Controller
@@ -31,8 +32,9 @@ class ProductController extends Controller
     public function create()
     {
          $sub_categories = SubCategory::all();
-         $child_categories = ChildCategory::all();    
-        return view('admin.pages.product.create',compact('sub_categories','child_categories'));
+         $child_categories = ChildCategory::all(); 
+         $categories = Category::with('sub_categories.child_categories')->get();   
+        return view('admin.pages.product.create',compact('sub_categories','child_categories','categories'));
     }
 
     /**
@@ -104,15 +106,17 @@ public function store(Request $request)
     public function edit(string $id)
     {
         $product = Product::with('product_images')->find($id);
+        
 
         if (!$product) {
             return redirect()->back()->with('error', 'Product not found');
         }
 
+        $categories = Category::with('sub_categories.child_categories')->get();
         $sub_categories = SubCategory::all();
         $child_categories = ChildCategory::all();
 
-        return view('admin.pages.product.edit', compact('product','sub_categories','child_categories'));
+        return view('admin.pages.product.edit', compact('product','sub_categories','child_categories','categories'));
     }
 
     /**

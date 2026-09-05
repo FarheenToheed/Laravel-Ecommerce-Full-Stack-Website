@@ -26,8 +26,9 @@ class CheckoutController extends Controller
         }
 
         $subtotal = $cart->cart_items->sum('total_price');
+        $user = auth()->user();
 
-        return view('web.pages.checkout.index', compact('cart', 'subtotal'));
+        return view('web.pages.checkout.index', compact('cart', 'subtotal','user'));
     }
 
 

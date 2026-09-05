@@ -10,25 +10,58 @@ use App\Models\Product;
 
 class HomeController extends Controller
 {
-    public function index()
+    //  public function index()
+    public function index($id = null)
     {
         // Sabse zyada order hue product IDs nikalo (Trending ke liye)
-        $topProductIds = DB::table('order_items')
-            ->select('product_id', DB::raw('SUM(quantity) as total_qty'))
-            ->groupBy('product_id')
-            ->orderByDesc('total_qty')
-            ->limit(8)
-            ->pluck('product_id');
+        // $topProductIds = DB::table('order_items')
+        //     ->select('product_id', DB::raw('SUM(quantity) as total_qty'))
+        //     ->groupBy('product_id')
+        //     ->orderByDesc('total_qty')
+        //     ->limit(8)
+        //     ->pluck('product_id');
 
-        $products = Product::with([
-                'product_images',
-                'product_variants.product_size',
-                'sub_category'
-            ])
-            ->where('status', 'active')
-            ->whereIn('id', $topProductIds)
-            ->get();
+        // $products = Product::with([
+        //         'product_images',
+        //         'product_variants.product_size',
+        //         'sub_category'
+        //     ])
+        //     ->where('status', 'active')
+        //     ->whereIn('id', $topProductIds)
+        //     ->get();
 
+        if ($id) {
+
+            $products = Product::with([
+                    'product_images',
+                    'product_variants.product_size',
+                    'sub_category'
+                ])
+                ->where('sub_category_id', $id)
+                ->where('status', 'active')
+                ->latest()
+                ->get();
+
+        } else {
+
+            // Sabse zyada order hue product IDs nikalo (Trending ke liye)
+            $topProductIds = DB::table('order_items')
+                ->select('product_id', DB::raw('SUM(quantity) as total_qty'))
+                ->groupBy('product_id')
+                ->orderByDesc('total_qty')
+                ->limit(8)
+                ->pluck('product_id');
+
+            $products = Product::with([
+                    'product_images',
+                    'product_variants.product_size',
+                    'sub_category'
+                ])
+                ->where('status', 'active')
+                ->whereIn('id', $topProductIds)
+                ->get();
+        }
+        // above code for showing products category wise
         $allproducts = Product::with([
                 'product_images',
                 'product_variants.product_size',

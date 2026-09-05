@@ -1,10 +1,10 @@
 // ================================
 // SEARCH TOGGLE
 // ================================
-function toggleSearch(e) {
-    e.preventDefault();
-    document.getElementById('searchOverlay').classList.toggle('active');
-}
+// function toggleSearch(e) {
+//     e.preventDefault();
+//     document.getElementById('searchOverlay').classList.toggle('active');
+// }
 
 // ================================
 // MOBILE MENU TOGGLE
@@ -1415,134 +1415,233 @@ document.addEventListener('DOMContentLoaded', function () {
 // search drawer code
 document.addEventListener('DOMContentLoaded', function () {
 
-    const searchInput = document.getElementById('searchDrawerInput');
+    const searchInput =
+        document.getElementById('searchDrawerInput');
 
-    const defaultBlock = document.getElementById('searchDefaultBlock');
-    const resultsBlock = document.getElementById('searchResultsBlock');
-    const loadingBlock = document.getElementById('searchLoadingBlock');
+    const defaultBlock =
+        document.getElementById('searchDefaultBlock');
 
-    const suggestionsList = document.getElementById('searchSuggestionsList');
-    const inspirationProducts = document.getElementById('searchInspirationProducts');
+    const resultsBlock =
+        document.getElementById('searchResultsBlock');
 
-    const resultsHeading = document.getElementById('searchResultsHeading');
-    const resultsProducts = document.getElementById('searchResultsProducts');
+    const loadingBlock =
+        document.getElementById('searchLoadingBlock');
+
+    const inspirationProducts =
+        document.getElementById('searchInspirationProducts');
+
+    const resultsHeading =
+        document.getElementById('searchResultsHeading');
+
+    const resultsProducts =
+        document.getElementById('searchResultsProducts');
+
+    const searchDrawer =
+        document.getElementById('searchDrawer');
 
 
-    // ==============================
-    // Load Drawer Data
-    // ==============================
+    // ==========================================
+    // LOAD DRAWER PRODUCTS
+    // ==========================================
 
     async function loadSearchDrawerData() {
 
         try {
 
-            const response = await fetch(searchDrawerDataUrl);
+            const response = await fetch(
+                searchDrawerDataUrl,
+                {
+                    method: 'GET',
+
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                }
+            );
+
 
             if (!response.ok) {
-                throw new Error('Drawer request failed');
+
+                console.error(
+                    'Drawer request failed:',
+                    response.status
+                );
+
+                // User ko error message NAHI dikhana
+                inspirationProducts.innerHTML = '';
+
+                return;
             }
+
 
             const data = await response.json();
 
-            renderSuggestions();
 
             renderProducts(
                 data.products || [],
                 inspirationProducts
             );
 
+
         } catch (error) {
 
-            console.error('Search drawer error:', error);
+            console.error(
+                'Search drawer error:',
+                error
+            );
 
-            inspirationProducts.innerHTML =
-                '<p>Unable to load products.</p>';
+            // IMPORTANT:
+            // "Unable to load products" show nahi karna
+            inspirationProducts.innerHTML = '';
+
         }
+
     }
 
 
-    // ==============================
-    // Suggestions
-    // ==============================
-
-    function renderSuggestions() {
-
-        const suggestions = [
-            'Lawn',
-            'Smart Casual',
-            'Matching Separates',
-            'Outfits',
-            'Tops'
-        ];
-
-        suggestionsList.innerHTML = '';
-
-        suggestions.forEach(function (suggestion) {
-
-            const li = document.createElement('li');
-
-            li.textContent = suggestion;
-
-            li.style.cursor = 'pointer';
-
-            li.addEventListener('click', function () {
-
-                searchInput.value = suggestion;
-
-                performSearch(suggestion);
-
-            });
-
-            suggestionsList.appendChild(li);
-
-        });
-    }
-
-
-    // ==============================
-    // Live Search
-    // ==============================
+    // ==========================================
+    // LIVE SEARCH
+    // ==========================================
 
     let searchTimer;
 
-    searchInput.addEventListener('input', function () {
 
-        const query = this.value.trim();
+    searchInput.addEventListener(
+        'input',
+        function () {
 
-        clearTimeout(searchTimer);
+            const query =
+                this.value.trim();
 
-        if (query.length === 0) {
 
-            defaultBlock.style.display = 'block';
-            resultsBlock.style.display = 'none';
-            loadingBlock.style.display = 'none';
+            clearTimeout(searchTimer);
 
-            return;
+
+            // Search empty ho
+            if (query.length === 0) {
+
+                defaultBlock.style.display = 'block';
+
+                resultsBlock.style.display = 'none';
+
+                loadingBlock.style.display = 'none';
+
+                loadSearchDrawerData();
+
+                return;
+            }
+
+
+            // 2 characters se kam
+            if (query.length < 2) {
+                return;
+            }
+
+
+            searchTimer = setTimeout(
+                function () {
+
+                    performSearch(query);
+
+                },
+                300
+            );
+
         }
+    );
 
 
-        if (query.length < 2) {
-            return;
+    // ==========================================
+    // ENTER PRESS
+    // ==========================================
+
+    searchInput.addEventListener(
+        'keydown',
+        function (event) {
+
+            if (event.key !== 'Enter') {
+                return;
+            }
+
+
+            event.preventDefault();
+
+
+            const query =
+                searchInput.value.trim();
+
+
+            if (!query) {
+                return;
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | ENTER PRESS
+            |--------------------------------------------------------------------------
+            |
+            | /search?q=keyword
+            |
+            */
+
+            window.location.href =
+                searchLiveUrl +
+                '?q=' +
+                encodeURIComponent(query);
+
         }
+    );
 
 
-        searchTimer = setTimeout(function () {
+    // ==========================================
+    // SEARCH ICON / FORM SUBMIT
+    // ==========================================
 
-            performSearch(query);
-
-        }, 300);
-
-    });
+    const searchForm =
+        document.getElementById('searchDrawerForm');
 
 
-    // ==============================
-    // Perform Search
-    // ==============================
+    if (searchForm) {
+
+        searchForm.addEventListener(
+            'submit',
+            function (event) {
+
+                event.preventDefault();
+
+
+                const query =
+                    searchInput.value.trim();
+
+
+                if (!query) {
+                    return;
+                }
+
+
+                window.location.href =
+                    searchLiveUrl +
+                    '?q=' +
+                    encodeURIComponent(query);
+
+            }
+        );
+
+    }
+
+
+    // ==========================================
+    // PERFORM LIVE SEARCH
+    // ==========================================
 
     async function performSearch(query) {
 
         defaultBlock.style.display = 'none';
+
         resultsBlock.style.display = 'none';
+
         loadingBlock.style.display = 'block';
 
 
@@ -1554,27 +1653,42 @@ document.addEventListener('DOMContentLoaded', function () {
                 encodeURIComponent(query);
 
 
-            const response = await fetch(url, {
-                headers: {
-                    'Accept': 'application/json'
+            const response = await fetch(
+                url,
+                {
+                    method: 'GET',
+
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
                 }
-            });
+            );
 
 
             if (!response.ok) {
-                throw new Error('Search request failed');
+
+                throw new Error(
+                    'Search request failed: ' +
+                    response.status
+                );
+
             }
 
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
 
             loadingBlock.style.display = 'none';
+
             resultsBlock.style.display = 'block';
 
 
             resultsHeading.textContent =
-                'Search results for "' + query + '"';
+                'Search results for "' +
+                query +
+                '"';
 
 
             renderProducts(
@@ -1585,22 +1699,37 @@ document.addEventListener('DOMContentLoaded', function () {
 
         } catch (error) {
 
-            console.error('Search error:', error);
+            console.error(
+                'Search error:',
+                error
+            );
+
 
             loadingBlock.style.display = 'none';
+
             resultsBlock.style.display = 'block';
 
-            resultsHeading.textContent = 'Search Results';
 
-            resultsProducts.innerHTML =
-                '<p>Something went wrong. Please try again.</p>';
+            resultsHeading.textContent =
+                'Search Results';
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | User ko technical error message na dikhao
+            |--------------------------------------------------------------------------
+            */
+
+            resultsProducts.innerHTML = '';
+
         }
+
     }
 
 
-    // ==============================
-    // Render Products
-    // ==============================
+    // ==========================================
+    // RENDER PRODUCTS
+    // ==========================================
 
     function renderProducts(products, container) {
 
@@ -1618,11 +1747,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
         products.forEach(function (product) {
 
+
+            // ======================================
+            // IMAGE
+            // ======================================
+
             const image =
                 product.product_images &&
                 product.product_images.length
                     ? product.product_images[0].image_path
                     : null;
+
+
+            // ======================================
+            // PRICE
+            // ======================================
 
             const price =
                 product.product_variants &&
@@ -1631,22 +1770,45 @@ document.addEventListener('DOMContentLoaded', function () {
                     : null;
 
 
+            // ======================================
+            // PRODUCT DETAIL URL
+            // ======================================
+
+            const productUrl =
+                '/products/' +
+                product.id;
+
+
+            // ======================================
+            // PRODUCT HTML
+            // ======================================
+
             const productHtml = `
 
-                <a href="/product/${product.id}"
+                <a href="${productUrl}"
                    class="search-product">
 
                     <div class="search-product-image">
 
                         ${
                             image
+
                             ?
-                            `<img src="/storage/${image}"
-                                 alt="${product.name}">`
+
+                            `
+                            <img
+                                src="/storage/${image}"
+                                alt="${product.name}"
+                            >
+                            `
+
                             :
-                            `<div class="no-image">
+
+                            `
+                            <div class="no-image">
                                 No Image
-                             </div>`
+                            </div>
+                            `
                         }
 
                     </div>
@@ -1654,13 +1816,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     <div class="search-product-info">
 
-                        <p>${product.name}</p>
+                        <p>
+                            ${product.name}
+                        </p>
+
 
                         ${
                             price
+
                             ?
-                            `<span>PKR ${Number(price).toLocaleString()}</span>`
+
+                            `
+                            <span>
+                                PKR ${Number(price).toLocaleString()}
+                            </span>
+                            `
+
                             :
+
                             ''
                         }
 
@@ -1681,13 +1854,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    // ==============================
-    // When Drawer Opens
-    // ==============================
-
-    const searchDrawer =
-        document.getElementById('searchDrawer');
-
+    // ==========================================
+    // WHEN DRAWER OPENS
+    // ==========================================
 
     if (searchDrawer) {
 
@@ -1697,9 +1866,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 searchInput.value = '';
 
-                defaultBlock.style.display = 'block';
-                resultsBlock.style.display = 'none';
-                loadingBlock.style.display = 'none';
+
+                defaultBlock.style.display =
+                    'block';
+
+
+                resultsBlock.style.display =
+                    'none';
+
+
+                loadingBlock.style.display =
+                    'none';
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Drawer ke 4 products load
+                |--------------------------------------------------------------------------
+                */
 
                 loadSearchDrawerData();
 
@@ -1709,3 +1893,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 });
+
+
+// ==========================================
+// SEARCH TOGGLE
+// ==========================================
+
+function toggleSearch(e) {
+
+    e.preventDefault();
+
+    document
+        .getElementById('searchOverlay')
+        .classList
+        .toggle('active');
+
+}

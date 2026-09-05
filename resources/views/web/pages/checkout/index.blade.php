@@ -44,12 +44,12 @@
                 <div class="row">
                     <div class="field">
                         <label>First Name <span class="required">*</span></label>
-                        <input type="text" id="first_name" required>
+                        <input type="text" id="first_name" value="{{ $user->name }}" required>
                     </div>
 
                     <div class="field">
                         <label>Last Name <span class="required">*</span></label>
-                        <input type="text" id="last_name">
+                        <input type="text" id="last_name" value="{{ $user->lastname }}">
                     </div>
                 </div>
 
@@ -103,7 +103,7 @@
                             <img src="https://flagcdn.com/w40/pk.png" alt="Pakistan">
                             +92
                         </span>
-                        <input type="text" id="phone" placeholder="300 1234567" maxlength="10">
+                        <input type="text" id="phone" placeholder="300 1234567"  value="{{ $user->phoneno ?? '' }}" maxlength="10">
                     </div>
                 </div>
 

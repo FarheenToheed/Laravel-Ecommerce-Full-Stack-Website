@@ -1141,17 +1141,27 @@ body {
 
 
 /* =========================
-   PRODUCT CARD (shared everywhere)
+   PRODUCT CARD  on home page
 ========================= */
 
 .product-slider{
     width:100%;
+    max-width:1400px;
     margin:40px auto;
+    padding:0 60px;
+    box-sizing:border-box;
 }
 
 .productSwiper{
     width:100%;
 }
+
+@media(max-width:768px){
+    .product-slider{
+        padding:0 20px;
+    }
+}
+/*  */
 
 .all-products-wrapper{
     width:100%;

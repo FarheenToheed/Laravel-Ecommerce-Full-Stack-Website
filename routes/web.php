@@ -30,6 +30,7 @@ Route::get('/search', [SearchController::class, 'search'])->name('search.live');
 
 
 
+
 //Route::get('/products',[ProductController::class,'index'])->name('index');
 //Route::get('/search',[ProductController::class,'search'])->name('search');
 // Route::get('/about',[PagesController::class,'about'])->name('about');
@@ -57,7 +58,9 @@ Route::get('/Faqs',[FaqController::class,'index'])->name('faqs');
 
 
 //Route::get('/products/{id}', [ProductController::class, 'index'])->name('products');
-// Route::get('/subcategory/{id}', [HomeController::class, 'index'])->name('subcategory.products');
+// sub categories on home page display
+Route::get('/subcategory-trending/{id}', [HomeController::class, 'index'])->name('home.subcategory');
+//  Route::get('/subcategory/{id}', [HomeController::class, 'index'])->name('home');
 Route::get('/products', [ProductController::class, 'index'])->name('products');
 Route::get('/products/{id}', [ProductController::class, 'show'])->name('products/details');
 
